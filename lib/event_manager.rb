@@ -44,6 +44,7 @@ puts 'Event Manager Initialized!'
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
 hour_histogram = Array.new(24, 0)
+day_of_week = Array.new(7,0)
 
 contents = CSV.open('event_attendees.csv', headers: true, header_converters: :symbol)
 contents.each do |row|
@@ -54,10 +55,12 @@ contents.each do |row|
   form_letter = erb_template.result(binding)
   # save_thank_you_letter(id, form_letter)
   phone_number = clean_phone_number(row[:homephone])
-  hour = Time.strptime(row[:regdate],'%m/%j/%y %H:%M').hour
-  hour_histogram[hour] += 1
+  time = Time.strptime(row[:regdate], '%m/%j/%y %H:%M')
+  hour_histogram[time.hour] += 1
+  day_of_week[time.wday] += 1
 
-  puts "#{name} #{phone_number}"
+  # puts "#{name} #{phone_number}"
 end
 
 hour_histogram.each_with_index { |num, hour| puts "#{hour}: #{num} registrants" }
+day_of_week.each_with_index { |num, day| puts "#{day}: #{num} registrants" }
